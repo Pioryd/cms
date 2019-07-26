@@ -182,3 +182,19 @@ def set_at_right_bound_parenthesis(self) -> bool:
       self.__init__(position=old_position)
       return False
   return True
+
+
+def get_character(self) -> str:
+  return self.source.str[self._index]
+
+
+def get_index(self) -> int:
+  return self._index
+
+
+def get_line_number(self) -> int:
+  return self._line_number
+
+
+def get_line_position(self) -> int:
+  return self._line_position
