@@ -188,3 +188,10 @@ class Position(object):
 
   def get_line_position(self) -> int:
     return self._line_position
+
+  def to_string(self) -> str:
+    return ("\nPosition:"
+            "\n\tLine number: {}"
+            "\n\tLine position: {}"
+            "\n\tIndex: {}".format(self._line_number, self._line_position,
+                                   self._index))
