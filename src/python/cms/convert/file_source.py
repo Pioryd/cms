@@ -41,6 +41,27 @@ class Source(object):
 
 
 class Position(object):
+  """ Position of source.
+  
+  Init:
+    Position(Position)
+      Copy all data from give position.
+    Position(Source)
+      Set source and deafult postion values.
+
+    Raises:
+      Exception: When source and position is None.
+
+  Attributes:
+    source: Source
+      Instance of Source to work with.
+    _index: int
+      Instance of Source to work with.
+    _line_number: int
+      Instance of Source to work with.
+    _line_position: int
+      Instance of Source to work with.
+  """
 
   def __init__(self, source: Source = None, position: 'Position' = None):
     if ((not (source and type(source) is Source)) and
@@ -55,15 +76,15 @@ class Position(object):
                           bool(type(position) is Position), type(position)))
 
     if source:
+      self.source = source
       self._index = 0
       self._line_number = 1
       self._line_position = 1
-      self.source = source
     else:
+      self.source = position.source
       self._index = position._index
       self._line_number = position._line_number
       self._line_position = position._line_position
-      self.source = position.source
 
   def move(self, count: int = 1) -> bool:
     index_last = len(self.source.str) - 1
