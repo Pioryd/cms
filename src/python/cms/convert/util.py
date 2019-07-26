@@ -81,6 +81,20 @@ def erase(string: str, sub_index: int, sub_lenght: int = -1) -> str:
 
 
 def substr(string: str, sub_index: int, sub_lenght: int = -1) -> str:
+  """ Return sub-string.
+
+  Args:
+    string: string to work on.
+    sub_index: index of sub-string.
+    sub_lenght(optional): lenght of sub-string. Deafult is -1. 
+      If less the 0 then take all characters until the end of string.
+
+  Returns:
+    string: string after erased sub-string.
+
+  Raises:
+    IndexError: If sub-string or part of sub-string is out of range.
+  """
   if sub_lenght == 0: return string
   if sub_lenght < 0: sub_lenght = len(string) - sub_index
 
@@ -98,21 +112,68 @@ def substr(string: str, sub_index: int, sub_lenght: int = -1) -> str:
 
 
 def remove_double_spaces(string: str) -> str:
+  """ Remove dobule spaces from the given string.
+
+  It's change '  ' to ''.
+
+  Args:
+    string: string to work on.
+
+  Returns:
+    string: string without double spaces.
+  """
   return re.sub("\s\s+", " ", string)
 
 
 def find(string: str, sub_string: str, position: int = 0) -> int:
+  """ Find sub-string in string.
+
+  Args:
+    string: string to search in.
+    sub_string: sub-string to search.
+    position: position of start seaching. Deafult is 0.
+
+  Returns:
+    int: Index of found sub-string. If not find then return -1.
+  """
   if position >= len(string) or position < 0: return -1
   return string.find(sub_string, position)
 
 
 def rfind(string: str, sub_string: str, position: int = -1) -> int:
+  """ Reverse find sub-string in string.
+
+  Args:
+    string: string to search in.
+    sub_string: sub-string to search.
+    position: position of start seaching. Deafult is -1. If -1 the search in
+      whole string.
+
+  Returns:
+    int: Index of found sub-string. If not find then return -1.
+  """
   if position == -1: position = len(string) - 1
   if position >= len(string) or position < 0: return -1
   return string.rfind(sub_string, 0, position + 1)
 
 
 def split_by_positions(string: str, positions: 'list[str]') -> 'list[str]':
+  """ Split string by given positions.
+
+  Splited string does not constains characters in given positions.
+  Positions are sorted before split.
+
+  Example:
+    >>> util.split_by_positions("This is a string", [2, 5, 13])
+    ["Th", "s ", "s a str", "ng"]
+
+  Args:
+    string: string to split.
+    positions: position to split string.
+
+  Returns:
+    list[str]: splited string.
+  """
   positions.sort()
 
   splited = []
