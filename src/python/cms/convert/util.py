@@ -2,11 +2,38 @@ import re
 
 
 def insert(string: str, index: int, insert_string: str) -> str:
+  """ Insert string to another string at given position.
+
+  Args:
+    string: string to which will be added additional string.
+    index: index to palce inserted string. If less then 0 then palce at the
+      begin. If greater then zero then place at the end.
+    insert_string: inserted string.
+
+  Returns:
+    string: result of insert.
+  """
   return string[:index] + insert_string + string[index:]
 
 
 def replace(string: str, sub_index: int, sub_lenght: int, count: int,
             replace_to: str) -> str:
+  """ Replace sub-string with given amount of strings.
+
+  Args:
+    string: string to which will be added additional string.
+    sub_index: index of sub-string to replace.
+    sub_lenght: lenght of sub-string to replace.
+    count: how many times add new string in place of replaced sub-string
+      Less then 0 mean 0.
+    replace_to: string to replace.
+
+  Returns:
+    string: result of replace.
+
+  Raises:
+    IndexError: If sub-string or part of sub-string is out of range.
+  """
   if (sub_index < 0 or sub_index >= len(string) or
       sub_index + sub_lenght - (1) >= len(string) or
       sub_index + sub_lenght - (1) < 0):
@@ -23,6 +50,20 @@ def replace(string: str, sub_index: int, sub_lenght: int, count: int,
 
 
 def erase(string: str, sub_index: int, sub_lenght: int = -1) -> str:
+  """ Erase sub-string.
+
+  Args:
+    string: string to work on.
+    sub_index: index of sub-string to replace.
+    sub_lenght(optional): lenght of sub-string to replace. Deafult is -1. 
+      If -1 then erase to the end of the string
+
+  Returns:
+    string: string after erased sub-string.
+
+  Raises:
+    IndexError: If sub-string or part of sub-string is out of range.
+  """
   if sub_lenght == 0: return string
   if sub_lenght == -1: sub_lenght = len(string) - sub_index
 
