@@ -130,3 +130,55 @@ def go_to_end_of_line(self, line: int = 0):
           self.__init__(position=old_position)
           return False
   return True
+
+
+def set_after_spaces(self) -> bool:
+  old_position = Position(position=self)
+
+  while self.move():
+    if not self.get_character().isspace(): return True
+
+  self.__init__(position=old_position)
+  return False
+
+
+def set_before_spaces(self) -> bool:
+  old_position = Position(position=self)
+
+  while self.rmove():
+    if not self.get_character().isspace(): return True
+
+  self.__init__(position=old_position)
+  return False
+
+
+def set_at_left_bound_parenthesis(self) -> bool:
+  if self.get_character() != ')': return False
+
+  old_position = Position(position=self)
+  opened = 0
+  while True:
+    if self.get_character() == ')': opened += 1
+    elif self.get_character() == '(': opened -= 1
+
+    if opened == 0: break
+    if not self.rmove():
+      self.__init__(position=old_position)
+      return False
+  return True
+
+
+def set_at_right_bound_parenthesis(self) -> bool:
+  if self.get_character() != '(': return False
+
+  old_position = Position(position=self)
+  opened = 0
+  while True:
+    if self.get_character() == '(': opened += 1
+    elif self.get_character() == ')': opened -= 1
+
+    if opened == 0: break
+    if not self.move():
+      self.__init__(position=old_position)
+      return False
+  return True
