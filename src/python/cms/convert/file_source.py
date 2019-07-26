@@ -1,4 +1,18 @@
 class Source(object):
+  """ Instance of source loaded form file 
+
+  Source data [self.str] shoud be modify very carefully. Position class is 
+  working on Source() instance. Any wrong change can break the logic of related
+  Position() instance.
+
+  Attributes:
+    file_name: str
+      file name which from was loaded source.
+    str: str
+      source data to work on.
+    _oryginal: str
+      original source data for restore needs.
+  """
 
   def __init__(self, file_name: str):
     self.file_name = file_name
@@ -8,14 +22,21 @@ class Source(object):
     self.reload()
 
   def reload(self):
+    """ Clear everything and load source from file. """
     with open(self.file_name, "r") as file:
       self._oryginal = file.read()
     self.str = self._oryginal
 
   def restore(self):
+    """ Restore [self.src] to stored orginal source """
     self.str = self._oryginal
 
-  def get_oryginal(self):
+  def get_oryginal(self) -> str:
+    """ Return original, not modified source. 
+    
+    Returns:
+      str: Return original source.
+    """
     return self._oryginal
 
 
