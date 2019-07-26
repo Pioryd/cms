@@ -56,11 +56,11 @@ class Position(object):
     source: Source
       Instance of Source to work with.
     _index: int
-      Instance of Source to work with.
+      Current index at source.
     _line_number: int
-      Instance of Source to work with.
+      Current line number at source.
     _line_position: int
-      Instance of Source to work with.
+      Current line position at source.
   """
 
   def __init__(self, source: Source = None, position: 'Position' = None):
@@ -87,6 +87,16 @@ class Position(object):
       self._line_position = position._line_position
 
   def move(self, count: int = 1) -> bool:
+    """ Move position by index.
+    
+    On fail, position is not changed.
+
+    Args:
+      count(optional): how many times move index. Default value is 1.
+
+    Returns:
+      bool: False if destination index is out of range.
+    """
     index_last = len(self.source.str) - 1
     if self._index + count > index_last: return False
 
@@ -107,6 +117,16 @@ class Position(object):
     return True
 
   def rmove(self, count: int = 1) -> bool:
+    """ Reverse move position by index.
+    
+    On fail, position is not changed.
+
+    Args:
+      count(optional): how many times reverse move index. Default value is 1.
+
+    Returns:
+      bool: False if destination index is out of range.
+    """
     if self._index - count < 0: return False
 
     i = 0
@@ -131,6 +151,16 @@ class Position(object):
     return True
 
   def go_to_begin_of_line(self, line: int = 0) -> bool:
+    """ Move to the begin of destination line.
+
+    On fail, position is not changed.
+
+    Args:
+      line(optional): to which line move. Default line is current line.
+
+    Returns:
+      bool: False if destination line is not exist.
+    """
     if line < 1: line = self._line_number
     old_position = Position(position=self)
 
@@ -150,6 +180,16 @@ class Position(object):
     return True
 
   def go_to_end_of_line(self, line: int = 0):
+    """ Move to the end of destination line.
+    
+    On fail, position is not changed.
+
+    Args:
+      line(optional): to which line move. Default line is current line.
+
+    Returns:
+      bool: False if destination line is not exist.
+    """
     if line < 1: line = self._line_number
     old_position = Position(position=self)
 
@@ -172,6 +212,14 @@ class Position(object):
     return True
 
   def set_after_spaces(self) -> bool:
+    """ Move to position after spaces.
+    
+    Current index must be as at None space character.
+    On fail, position is not changed.
+
+    Returns:
+        False: if not found character after spaces
+    """
     old_position = Position(position=self)
 
     while self.move():
@@ -181,6 +229,14 @@ class Position(object):
     return False
 
   def set_before_spaces(self) -> bool:
+    """ Move to position before spaces.
+    
+    Current index must be as at None space character.
+    On fail, position is not changed.
+
+    Returns:
+        False: if not found character before spaces
+    """
     old_position = Position(position=self)
 
     while self.rmove():
@@ -190,6 +246,14 @@ class Position(object):
     return False
 
   def set_at_left_bound_parenthesis(self) -> bool:
+    """ Move to position at left bound parenthesis.
+    
+    Current index must be as at right parenthesis.
+    On fail, position is not changed.
+
+    Returns:
+        False: if not found left bound parenthesis
+    """
     if self.get_character() != ')': return False
 
     old_position = Position(position=self)
@@ -205,6 +269,14 @@ class Position(object):
     return True
 
   def set_at_right_bound_parenthesis(self) -> bool:
+    """ Move to position at right bound parenthesis.
+    
+    Current index must be as at left parenthesis.
+    On fail, position is not changed.
+
+    Returns:
+        False: if not found right bound parenthesis
+    """
     if self.get_character() != '(': return False
 
     old_position = Position(position=self)
@@ -232,6 +304,14 @@ class Position(object):
     return self._line_position
 
   def to_string(self) -> str:
+    """ Information about position in string format
+
+    Example:
+      Position:
+        Line number: 1
+        Line position: 1
+        Index: 0
+    """
     return ("\nPosition:"
             "\n\tLine number: {}"
             "\n\tLine position: {}"
