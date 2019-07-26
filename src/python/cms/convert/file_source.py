@@ -88,113 +88,103 @@ class Position(object):
 
     return True
 
+  def go_to_begin_of_line(self, line: int = 0) -> bool:
+    if line < 1: line = self._line_number
+    old_position = Position(position=self)
 
-def go_to_begin_of_line(self, line: int = 0) -> bool:
-  if line < 1: line = self._line_number
-  old_position = Position(position=self)
-
-  while not (line == self._line_number and self._line_position == 1):
-    if self._line_number > line:
-      if not self.rmove():
-        self.__init__(position=old_position)
-        return False
-    elif self._line_number < line:
-      if not self.move():
-        self.__init__(position=old_position)
-        return False
-    elif self._line_position > 1:
-      if not self.rmove():
-        self.__init__(position=old_position)
-        return False
-  return True
-
-
-def go_to_end_of_line(self, line: int = 0):
-  if line < 1: line = self._line_number
-  old_position = Position(position=self)
-
-  index_end = len(self.source.str) - 1
-  while (not (line == self._line_number and
-              (self.get_character() == '\n' or self._index == index_end))):
-    if self._line_number > line:
-      if not self.rmove():
-        self.__init__(position=old_position)
-        return False
-    elif self._line_number < line:
-      if not self.move():
-        self.__init__(position=old_position)
-        return False
-    elif self.get_character() != '\n':
-      if self._index < (len(self.source.str) - 1):
+    while not (line == self._line_number and self._line_position == 1):
+      if self._line_number > line:
+        if not self.rmove():
+          self.__init__(position=old_position)
+          return False
+      elif self._line_number < line:
         if not self.move():
           self.__init__(position=old_position)
           return False
-  return True
+      elif self._line_position > 1:
+        if not self.rmove():
+          self.__init__(position=old_position)
+          return False
+    return True
 
+  def go_to_end_of_line(self, line: int = 0):
+    if line < 1: line = self._line_number
+    old_position = Position(position=self)
 
-def set_after_spaces(self) -> bool:
-  old_position = Position(position=self)
+    index_end = len(self.source.str) - 1
+    while (not (line == self._line_number and
+                (self.get_character() == '\n' or self._index == index_end))):
+      if self._line_number > line:
+        if not self.rmove():
+          self.__init__(position=old_position)
+          return False
+      elif self._line_number < line:
+        if not self.move():
+          self.__init__(position=old_position)
+          return False
+      elif self.get_character() != '\n':
+        if self._index < (len(self.source.str) - 1):
+          if not self.move():
+            self.__init__(position=old_position)
+            return False
+    return True
 
-  while self.move():
-    if not self.get_character().isspace(): return True
+  def set_after_spaces(self) -> bool:
+    old_position = Position(position=self)
 
-  self.__init__(position=old_position)
-  return False
+    while self.move():
+      if not self.get_character().isspace(): return True
 
+    self.__init__(position=old_position)
+    return False
 
-def set_before_spaces(self) -> bool:
-  old_position = Position(position=self)
+  def set_before_spaces(self) -> bool:
+    old_position = Position(position=self)
 
-  while self.rmove():
-    if not self.get_character().isspace(): return True
+    while self.rmove():
+      if not self.get_character().isspace(): return True
 
-  self.__init__(position=old_position)
-  return False
+    self.__init__(position=old_position)
+    return False
 
+  def set_at_left_bound_parenthesis(self) -> bool:
+    if self.get_character() != ')': return False
 
-def set_at_left_bound_parenthesis(self) -> bool:
-  if self.get_character() != ')': return False
+    old_position = Position(position=self)
+    opened = 0
+    while True:
+      if self.get_character() == ')': opened += 1
+      elif self.get_character() == '(': opened -= 1
 
-  old_position = Position(position=self)
-  opened = 0
-  while True:
-    if self.get_character() == ')': opened += 1
-    elif self.get_character() == '(': opened -= 1
+      if opened == 0: break
+      if not self.rmove():
+        self.__init__(position=old_position)
+        return False
+    return True
 
-    if opened == 0: break
-    if not self.rmove():
-      self.__init__(position=old_position)
-      return False
-  return True
+  def set_at_right_bound_parenthesis(self) -> bool:
+    if self.get_character() != '(': return False
 
+    old_position = Position(position=self)
+    opened = 0
+    while True:
+      if self.get_character() == '(': opened += 1
+      elif self.get_character() == ')': opened -= 1
 
-def set_at_right_bound_parenthesis(self) -> bool:
-  if self.get_character() != '(': return False
+      if opened == 0: break
+      if not self.move():
+        self.__init__(position=old_position)
+        return False
+    return True
 
-  old_position = Position(position=self)
-  opened = 0
-  while True:
-    if self.get_character() == '(': opened += 1
-    elif self.get_character() == ')': opened -= 1
+  def get_character(self) -> str:
+    return self.source.str[self._index]
 
-    if opened == 0: break
-    if not self.move():
-      self.__init__(position=old_position)
-      return False
-  return True
+  def get_index(self) -> int:
+    return self._index
 
+  def get_line_number(self) -> int:
+    return self._line_number
 
-def get_character(self) -> str:
-  return self.source.str[self._index]
-
-
-def get_index(self) -> int:
-  return self._index
-
-
-def get_line_number(self) -> int:
-  return self._line_number
-
-
-def get_line_position(self) -> int:
-  return self._line_position
+  def get_line_position(self) -> int:
+    return self._line_position
