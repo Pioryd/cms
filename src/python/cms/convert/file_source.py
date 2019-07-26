@@ -87,3 +87,46 @@ class Position(object):
       i += 1
 
     return True
+
+
+def go_to_begin_of_line(self, line: int = 0) -> bool:
+  if line < 1: line = self._line_number
+  old_position = Position(position=self)
+
+  while not (line == self._line_number and self._line_position == 1):
+    if self._line_number > line:
+      if not self.rmove():
+        self.__init__(position=old_position)
+        return False
+    elif self._line_number < line:
+      if not self.move():
+        self.__init__(position=old_position)
+        return False
+    elif self._line_position > 1:
+      if not self.rmove():
+        self.__init__(position=old_position)
+        return False
+  return True
+
+
+def go_to_end_of_line(self, line: int = 0):
+  if line < 1: line = self._line_number
+  old_position = Position(position=self)
+
+  index_end = len(self.source.str) - 1
+  while (not (line == self._line_number and
+              (self.get_character() == '\n' or self._index == index_end))):
+    if self._line_number > line:
+      if not self.rmove():
+        self.__init__(position=old_position)
+        return False
+    elif self._line_number < line:
+      if not self.move():
+        self.__init__(position=old_position)
+        return False
+    elif self.get_character() != '\n':
+      if self._index < (len(self.source.str) - 1):
+        if not self.move():
+          self.__init__(position=old_position)
+          return False
+  return True
