@@ -129,7 +129,8 @@ def decrypt_strings(data: str,
       strings with types given in list[types_to_decrypt]
 
   Returns:
-    data:
+    data: decrypted data.
+  """
   for encrypted_string in encrypted_strings:
     if encrypted_string.position >= len(data):
       raise Exception(
