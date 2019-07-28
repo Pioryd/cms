@@ -5,6 +5,16 @@ import convert.util as util
 
 
 class EncryptedString(object):
+  """ Encrypt string.
+
+  Args:
+    type: Type
+      Type of encrypted string.
+    data: str
+      Encrypted string.
+    position: int
+      Position at source of encrypted string.
+  """
 
   class Type(Enum):
     NONE = 1
@@ -21,6 +31,21 @@ class EncryptedString(object):
 def encrypt_strings(data: str,
                     types_to_encrypt: list = [EncryptedString.Type.NONE]
                    ) -> (str, List[EncryptedString]):
+  """ Encrypt data.
+
+  Example:
+    ["abc"] -> [?????] or ['abc'] -> [?????] or [//abc] -> [?????]
+
+  Args:
+    data: data to encrypt.
+    types_to_encrypt(optional): types to encrpyt. Default is [NONE]. 
+      If [NONE] is set then encrypt all types. Otherwhise encrypt 
+      strings with types given in list [types_to_encrypt]
+
+  Returns:
+    data: encrypted data.
+    encrypted_strings: encrypted strings.
+  """
   encrypted_strings = []  # List[EncryptedString]
   type_of_found_string = EncryptedString.Type.NONE
   index_of_found_open_statement = -1
@@ -91,6 +116,20 @@ def decrypt_strings(data: str,
                     encrypted_strings: List[EncryptedString],
                     types_to_decrypt: list = [EncryptedString.Type.NONE]
                    ) -> str:
+  """ Decrypt data.
+
+  Example:
+    [?????] -> ["abc"] or [?????] -> ['abc'] or [?????] -> [//abc]
+
+  Args:
+    data: data to decrypt.
+    encrypted_strings: encrypted strings.
+    types_to_decrypt(optional): types to decrypt. Default is [NONE]. 
+      If [NONE] is set then decrypt all encryped string. Otherwise decrypt 
+      strings with types given in list[types_to_decrypt]
+
+  Returns:
+    data:
   for encrypted_string in encrypted_strings:
     if encrypted_string.position >= len(data):
       raise Exception(
