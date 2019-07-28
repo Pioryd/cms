@@ -311,6 +311,16 @@ class BlocksOfInstructions(object):
 
 
 class Header(object):
+  """ Constains header informations
+
+  Args:
+    index_at_main_source: str
+      position of header at main source
+    type: Header.Type
+      header type
+    header_source: str
+      header source in python syntax
+  """
 
   class Type(Enum):
     UNKNOWN = 1
@@ -326,6 +336,13 @@ class Header(object):
     self.header_source = ""
 
   def set(self, type: Type, header_body_source: str, index_at_main_source: int):
+    """ Set header informations and convert to python syntax
+
+    Args:
+      type: header type        
+      header_body_source: header body source in cms syntax     
+      index_at_main_source: position of header at main source
+    """
     self.type = type
     self.index_at_main_source = index_at_main_source
 
@@ -337,6 +354,11 @@ class Header(object):
       self._convert_function(header_body_source)
 
   def _convert_struct(self, header_body_source: str):
+    """ Convert struct header body from cms to python syntax.
+
+    Args:     
+      header_body_source: header body source in cms syntax.    
+    """
     header_body_source = header_body_source.replace(',', ' ')
     header_body_source = header_body_source.replace(':', ' ')
     header_body_source = util.remove_double_spaces(header_body_source)
@@ -360,6 +382,11 @@ class Header(object):
       if i == len(splited_header) - 1: self.header_source += "):"
 
   def _convert_while_or_if(self, header_body_source: str):
+    """ Convert loop header body from cms to python syntax.
+
+    Args:     
+      header_body_source: header body source in cms syntax.   
+    """
     header_body_source = header_body_source.replace('->', '.')
     header_body_source = header_body_source.replace('cms::', 'convert.')
     header_body_source = util.remove_double_spaces(header_body_source)
@@ -373,6 +400,11 @@ class Header(object):
     self.header_source = header_body_source
 
   def _convert_function(self, header_body_source: str):
+    """ Convert function header body from cms to python syntax.
+
+    Args:     
+      header_body_source: header body source in cms syntax.   
+    """
     index_of_close_statement = header_body_source.find('(')
 
     # "void  fun  (args..)" -> "void  fun  "
