@@ -58,10 +58,37 @@ class TestInit(unittest.TestCase):
     self.remove_folder_if_exist(test_folder)
 
   def test_convert_files(self):
-    pass
+    test_folder = os.path.join(self.CURRENT_DIRECTORY, "test_init_2")
+
+    self.remove_folder_if_exist(test_folder)
+
+    created_files = self.create_directory_with_files(test_folder, 3)
+
+    self.assertEqual(convert.convert_files(test_folder), "")
+
+    for file in created_files:
+      self.assertTrue(os.path.exists(file + ".py"))
+
+    self.remove_folder_if_exist(test_folder)
 
   def test_convert_files_recursive(self):
-    pass
+    test_folder = os.path.join(self.CURRENT_DIRECTORY, "test_init_3")
+    test_sub_folder_1 = os.path.join(test_folder, "sub_1")
+    test_sub_folder_2 = os.path.join(test_folder, "sub_2")
+
+    self.remove_folder_if_exist(test_folder)
+
+    created_files = []
+    created_files.extend(self.create_directory_with_files(test_folder, 3))
+    created_files.extend(self.create_directory_with_files(test_sub_folder_1, 4))
+    created_files.extend(self.create_directory_with_files(test_sub_folder_2, 6))
+
+    self.assertEqual(convert.convert_files_recursive(test_folder), "")
+
+    for file in created_files:
+      self.assertTrue(os.path.exists(file + ".py"))
+
+    self.remove_folder_if_exist(test_folder)
 
 
 if __name__ == '__main__':
