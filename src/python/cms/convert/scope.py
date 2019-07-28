@@ -256,7 +256,119 @@ class BlocksOfInstructions(object):
 
 
 class Header(object):
-  pass
+
+  class Type(Enum):
+    UNKNOWN = 1
+    ROOT = 2
+    STRUCT = 3
+    FUNCTION = 4
+    LOOP_WHILE = 5
+    IF_STATEMENT = 6
+
+  def __init__(self, index_at_main_source: int, type=Type.UNKNOWN):
+    self.index_at_main_source = index_at_main_source
+    self.type = type
+    self.header_source = ""
+
+  def set(self, type: Type, header_body_source: str, index_at_main_source: int):
+    self.type = type
+    self.index_at_main_source = index_at_main_source
+
+    if type == Header.Type.STRUCT:
+      self._convert_struct(header_body_source)
+    if type == Header.Type.LOOP_WHILE or type == Header.Type.IF_STATEMENT:
+      self._convert_while_or_if(header_body_source)
+    if type == Header.Type.FUNCTION:
+      self._convert_function(header_body_source)
+
+  def _convert_struct(self, header_body_source: str):
+    header_body_source = header_body_source.replace(',', ' ')
+    header_body_source = header_body_source.replace(':', ' ')
+    header_body_source = util.remove_double_spaces(header_body_source)
+    header_body_source = header_body_source.strip()
+
+    splited_header = header_body_source.split(" ")
+
+    for i, header_part in enumerate(splited_header):
+      if i == 0:
+        self.header_source += "class "
+        continue
+
+      if len(splited_header) == 2:
+        self.header_source += header_part
+        self.header_source += "(object):"
+        break
+
+      if i > 0: self.header_source += header_part
+      if i == 1: self.header_source += "("
+      if (i > 1) and (i < (len(splited_header) - 1)): self.header_source += ", "
+      if i == len(splited_header) - 1: self.header_source += "):"
+
+  def _convert_while_or_if(self, header_body_source: str):
+    header_body_source = header_body_source.replace('->', '.')
+    header_body_source = header_body_source.replace('cms::', 'convert.')
+    header_body_source = util.remove_double_spaces(header_body_source)
+    header_body_source = header_body_source.strip()
+
+    header_body_source += ":"
+
+    header_body_source = header_body_source.replace(" || ", " or ")
+    header_body_source = header_body_source.replace(" && ", " and ")
+
+    self.header_source = header_body_source
+
+  def _convert_function(self, header_body_source: str):
+    index_of_close_statement = header_body_source.find('(')
+
+    # "void  fun  (args..)" -> "void  fun  "
+    function_name = util.substr(header_body_source, 0, index_of_close_statement)
+    # "void  fun  " -> "void  fun"
+    function_name = function_name.strip()
+    # "void  fun" -> " fun"
+    function_name = util.substr(function_name, function_name.rfind(' '))
+    # " fun" -> "fun"
+    function_name = function_name.strip()
+
+    header_body_source = header_body_source[index_of_close_statement:]
+
+    header_body_source = header_body_source.replace('(', ',')
+    header_body_source = header_body_source.replace(')', ',')
+    header_body_source = header_body_source.replace('::', '.')
+    header_body_source = header_body_source.replace('\n', ' ')
+    header_body_source = util.remove_double_spaces(header_body_source)
+
+    header_body_source = header_body_source.replace('const,', ',')
+    header_body_source = header_body_source.replace(',const', ',')
+    header_body_source = header_body_source.replace('const ', ' ')
+    header_body_source = header_body_source.replace(' const,', ' ')
+    header_body_source = header_body_source.replace('*,', '')
+    header_body_source = header_body_source.replace('&,', '')
+
+    header_body_source = header_body_source.strip()
+
+    function_arguments = header_body_source.split(",")
+
+    # Remove types from arguments. "int a" -> "a"
+    i = 0
+    while i < len(function_arguments):
+      if not function_arguments[i]:
+        del function_arguments[i]
+        continue
+      else:
+        index_of_open_statement = function_arguments[i].rfind(" ")
+        if index_of_open_statement == -1:
+          raise Exception("Argument without type: %s." %
+                          (function_arguments[i]))
+        function_arguments[i] = function_arguments[i][index_of_open_statement:]
+        function_arguments[i] = function_arguments[i].strip()
+      i += 1
+
+    # Create python syntax "def fun(args...):"
+    self.header_source += "def " + function_name + "("
+    for i, argument in enumerate(function_arguments):
+      self.header_source += argument
+      if i < (len(function_arguments) - 1): self.header_source += ", "
+    self.header_source += "):"
 
 
 class Scope(object):
