@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import List, Dict
+
+import convert.util as util
 
 
 class EncryptedString(object):
@@ -9,5 +12,95 @@ class EncryptedString(object):
     STRING_APOSTROPHE = 3
     STRING_QUOTATION = 4
 
-  def __init__(self, type: Type):
+  def __init__(self, type: Type, position: int, data: str):
     self.type = type
+    self.data = data
+    self.position = position
+
+
+def encrypt_strings(data: str,
+                    types_to_encrypt: list = [EncryptedString.Type.NONE]
+                   ) -> (str, List[EncryptedString]):
+  encrypted_strings = []  # List[EncryptedString]
+  type_of_found_string = EncryptedString.Type.NONE
+  index_of_found_open_statement = -1
+  index_of_found_close_statement = -1
+
+  i = 0
+  while i < len(data):
+    if type_of_found_string == EncryptedString.Type.NONE:
+      if data[i] == '/' and (i + 1) < len(data) and data[i + 1] == '/':
+        type_of_found_string = EncryptedString.Type.COMMENT
+        index_of_found_open_statement = i
+        index_of_found_close_statement = -1
+      elif data[i] == "'":
+        type_of_found_string = EncryptedString.Type.STRING_APOSTROPHE
+        index_of_found_open_statement = i
+        index_of_found_close_statement = -1
+      elif data[i] == '"':
+        type_of_found_string = EncryptedString.Type.STRING_QUOTATION
+        index_of_found_open_statement = i
+        index_of_found_close_statement = -1
+    elif type_of_found_string == EncryptedString.Type.COMMENT:
+      if data[i] == "\n": index_of_found_close_statement = i
+    elif type_of_found_string == EncryptedString.Type.STRING_APOSTROPHE:
+      if data[i] == "'" and (i - 1) >= 0 and data[i - 1] != '\\':
+        index_of_found_close_statement = i
+    elif type_of_found_string == EncryptedString.Type.STRING_QUOTATION:
+      if data[i] == '"' and (i - 1) >= 0 and data[i - 1] != '\\':
+        index_of_found_close_statement = i
+
+    # Check if it's comment without close statement '\n', becouse of eof.
+    if i == (len(data) - 1) and index_of_found_open_statement != -1:
+      index_of_found_close_statement = i
+
+    if (index_of_found_open_statement == -1 or
+        index_of_found_close_statement == -1):
+      i += 1
+      continue
+
+    # Encrypt string if is same type as types to encrypt.
+    if (EncryptedString.Type.NONE in types_to_encrypt or
+        type_of_found_string in types_to_encrypt):
+      string_lenght = ((1) + index_of_found_close_statement -
+                       index_of_found_open_statement)
+
+      # Comment must be encrypted without close statement '\n'
+      if (type_of_found_string == EncryptedString.Type.COMMENT and
+          (i != (len(data) - 1))):
+        string_lenght -= 1
+
+      encrypted_strings.append(
+          EncryptedString(
+              type_of_found_string, index_of_found_open_statement,
+              util.substr(data, index_of_found_open_statement, string_lenght)))
+
+      # ["abc"] -> [?????] or ['abc'] -> [?????] or [//abc] -> [?????]
+      data = util.replace(data, index_of_found_open_statement, string_lenght,
+                          string_lenght, '?')
+
+    type_of_found_string = EncryptedString.Type.NONE
+    index_of_found_open_statement = -1
+    index_of_found_close_statement = -1
+    i += 1
+
+  return data, encrypted_strings
+
+
+def decrypt_strings(data: str,
+                    encrypted_strings: List[EncryptedString],
+                    types_to_decrypt: list = [EncryptedString.Type.NONE]
+                   ) -> str:
+  for encrypted_string in encrypted_strings:
+    if encrypted_string.position >= len(data):
+      raise Exception(
+          ("Position of encrypted data is out of data range."
+           " EncryptedString end position: %s. Source size: %s.") %
+          (encrypted_string.position + len(encrypted_string.data), len(data)))
+
+    # [?????] -> ["abc"] or [?????] -> ['abc'] or [?????] -> [//abc]
+    if (EncryptedString.Type.NONE in types_to_decrypt or
+        encrypted_string.type in types_to_decrypt):
+      data = util.replace(data, encrypted_string.position,
+                          len(encrypted_string.data), 1, encrypted_string.data)
+  return data
