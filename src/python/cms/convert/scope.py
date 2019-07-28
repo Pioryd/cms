@@ -459,6 +459,24 @@ class Header(object):
 
 
 class Scope(object):
+  """ Constans all informations and sources.
+
+  Scopes are connected as tree. Root scope is main scope.
+
+  Args:     
+    id: int
+      Scope id uses only for debug information.
+    blocks_of_instructions: BlocksOfInstructions
+      Blocks of instructions of this sope.
+    header: Header
+      Scope header.
+    childs: list[Scope]
+      Scope childs. Index is sorted.
+    open_statement_position: Position
+      Position of open statement '{'
+    close_statement_position: Position
+      Position of close statement '}'
+  """
   STATIC_ID = itertools.count()
 
   def __init__(self,
@@ -479,9 +497,25 @@ class Scope(object):
           position=close_statement_position)
 
   def process_open(self, open_statement_position: Position) -> 'Scope':
+    """ Create new childs with given position open statement.
+
+    Args:     
+      open_statement_position: new childs open statement position.   
+
+    Returns:
+      string: New created child.
+    """
     self.childs.append(Scope(self, open_statement_position))
     return self.childs[len(self.childs) - 1]
 
   def process_close(self, close_statement_position: Position) -> 'Scope':
+    """ Close this scope and return parent scope.
+
+    Args:     
+      open_statement_position: this scope close statement position.  
+
+    Returns:
+      string: Parent scope.
+    """
     self.close_statement_position = Position(position=close_statement_position)
     return self.parent
