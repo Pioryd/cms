@@ -49,13 +49,135 @@ class Converter(object):
     return self.python_source.as_text
 
   def _create_scopes_by_brackets(self):
-    pass
+    current_position = Position(self.source)
+    current_scope = self.root_scope
+    is_open = False
+
+    while True:
+      if current_position.get_character() == '{':
+        current_scope = current_scope.process_open(current_position)
+        is_open = True
+      if current_position.get_character() == '}':
+        current_scope = current_scope.process_close(current_position)
+        is_open = False
+      if not current_position.move(): break
+
+    current_scope.process_close(current_position)
+
+    if is_open: raise Exception("One or more brackets missing.")
 
   def _set_headers_to_scopes(self, childs: 'list[Scope]'):
-    pass
+    for child in childs:
+      self._set_header_to_scope(child)
+      self._set_headers_to_scopes(child.childs)
 
   def _set_header_to_scope(self, scope: Scope):
-    pass
+    current_position = Position(position=scope.open_statement_position)
+
+    #  *  <-     *
+    # ')' <- ')  {'
+    current_position.set_before_spaces()
+
+    scope_type = Header.Type.UNKNOWN
+    scope_header_start = 0
+    scope_header_size = 0
+
+    its_not_function = False
+
+    if current_position.get_character() == ')':
+      # Possible: [function] or [while] or [if]
+
+      #               * <-*
+      # 'while( (a) > (b) )'
+      found = util.rfind(self.source.str, '(', current_position.get_index())
+      if found == -1:
+        raise Exception("Not found left parenthesis: '('. %s" %
+                        (current_position.to_string()))
+
+      #  '( )'  33 % is function
+      # '( (a) > (b) )' 100% is NOT function
+      if (util.find((util.substr(self.source.str, found + 1,
+                                 current_position.get_index() - found - 1)),
+                    ")") != -1):  # Possible: [while] or [if]
+        current_position.set_at_left_bound_parenthesis()
+        its_not_function = True
+      else:  # Possible: [function] or [while] or [if]
+        current_position.rmove(current_position.get_index() - found)
+
+      #   * <- *
+      # 'if    (a)'
+      current_position.set_before_spaces()
+
+      if_statement = "if"
+      while_statement = "while"
+      start_index_of_if_statement = (current_position.get_index() -
+                                     len(if_statement) + 1)
+      start_index_of_while_statement = (current_position.get_index() -
+                                        len(while_statement) + 1)
+
+      if (util.substr(self.source.str, start_index_of_if_statement,
+                      len(if_statement)) == if_statement):  # [IF]
+        scope_type = Header.Type.IF_STATEMENT
+        scope_header_start = start_index_of_if_statement
+        scope_header_size = (scope.open_statement_position.get_index() -
+                             start_index_of_if_statement)
+      elif (util.substr(self.source.str, start_index_of_while_statement,
+                        len(while_statement)) == while_statement):  # [WHILE]
+        scope_type = Header.Type.LOOP_WHILE
+        scope_header_start = start_index_of_while_statement
+        scope_header_size = (scope.open_statement_position.get_index() -
+                             start_index_of_while_statement)
+      else:  # [FUNCTION]
+        if its_not_function:
+          raise Exception(
+              "Wrong statement. Its not 'while' and not 'if': '('. " +
+              current_position.to_string())
+
+        start_index_of_function = -1
+        if current_position.get_line_number() == 1:
+          start_index_of_function = 0
+        else:
+          new_line_character = "\n"
+          start_index_of_function = (
+              util.rfind(self.source.str, new_line_character,
+                         current_position.get_index()) +
+              len(new_line_character))
+          if start_index_of_function == -1:
+            raise Exception("No function type: '('. %s" %
+                            (current_position.to_string()))
+
+        scope_type = Header.Type.FUNCTION
+        scope_header_start = start_index_of_function
+        scope_header_size = (scope.open_statement_position.get_index() -
+                             start_index_of_function)
+
+      # TODO
+      # Check if position of '(' is outsdie of possile range like parent
+      # openStatementPosition or previous child
+      # closeStatementPosition
+    else:  # [struct]
+      # TODO
+      # Check if position of 'struct' is outsdie of possile range like parent
+      # openStatementPosition or previous child
+      # closeStatementPosition
+
+      scope_type = Header.Type.STRUCT
+
+      found = util.rfind(self.source.str, "struct",
+                         current_position.get_index())
+      if found == -1:
+        raise Exception("Not found struct statement: 'struct'. {}".format(
+            current_position.to_string()))
+
+      scope_header_start = found
+      scope_header_size = (scope.open_statement_position.get_index() - found)
+
+    if scope_type == Header.Type.UNKNOWN: raise Exception("Unknown scope type")
+
+    scope.header.set(
+        scope_type,
+        util.substr(self.source.str, scope_header_start, scope_header_size),
+        scope_header_start)
 
   def _set_instructions_to_scopes(self, childs: 'list<Scope>'):
     pass
