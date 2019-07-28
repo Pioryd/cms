@@ -34,7 +34,37 @@ class TestBlocksOfInstructions(unittest.TestCase):
 class TestHeader(unittest.TestCase):
 
   def test_all(self):
-    pass
+    # test struct
+    cpp_header = "struct MyStruct : Parent, OldParent"
+    python_header = "class MyStruct(Parent, OldParent):"
+    header = Header(0)
+    #
+    header.set(Header.Type.STRUCT, cpp_header, 0)
+    self.assertEqual(header.header_source, python_header)
+
+    # test while
+    cpp_header = "while(var == true && is_openon || (test == 5))"
+    python_header = "while(var == true and is_openon or (test == 5)):"
+    header = Header(0)
+    #
+    header.set(Header.Type.LOOP_WHILE, cpp_header, 0)
+    self.assertEqual(header.header_source, python_header)
+
+    # test if
+    cpp_header = "if(var == true && is_openon || (test == 5))"
+    python_header = "if(var == true and is_openon or (test == 5)):"
+    header = Header(0)
+    #
+    header.set(Header.Type.IF_STATEMENT, cpp_header, 0)
+    self.assertEqual(header.header_source, python_header)
+
+    # test finction
+    cpp_header = "void fun(const int a, char* b, const std::string& c)"
+    python_header = "def fun(a, b, c):"
+    header = Header(0)
+    #
+    header.set(Header.Type.FUNCTION, cpp_header, 0)
+    self.assertEqual(header.header_source, python_header)
 
 
 class TestScope(unittest.TestCase):
