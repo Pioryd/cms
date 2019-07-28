@@ -91,6 +91,60 @@ class TestUtil(unittest.TestCase):
     with self.assertRaises(IndexError):
       util.substr(string, -10, 2)
 
+  def test_remove_double_spaces(self):
+    string = "   This      is     a     string   "
+
+    self.assertEqual(util.remove_double_spaces(string), " This is a string ")
+    self.assertEqual(util.remove_double_spaces(""), "")
+    self.assertEqual(util.remove_double_spaces(" "), " ")
+
+  def test_find(self):
+    string = "This is a string"
+
+    # Seach in cetner of string
+    self.assertEqual(util.find(string, "is", 3), 5)
+    self.assertEqual(util.find(string, "is"), 2)
+
+    # Seach in begin of string
+    self.assertEqual(util.find(string, "T", 0), 0)
+    self.assertEqual(util.find(string, "T"), 0)
+
+    # Seach in end of string
+    self.assertEqual(util.find(string, "i", 10), 13)
+    self.assertEqual(util.find(string, "i"), 2)
+
+    # Search for last element
+    self.assertEqual(util.find(string, "g", 15), 15)
+    self.assertEqual(util.find(string, "g"), 15)
+
+    # Search in out of range
+    self.assertEqual(util.find(string, "a", 16), -1)
+    self.assertEqual(util.find(string, "a", -10), -1)
+
+  def test_rfind(self):
+    string = "This is a string"
+
+    # Seach in cetner of string
+    self.assertEqual(util.rfind(string, "is", 4), 2)
+    self.assertEqual(util.rfind(string, "is"), 5)
+
+    # Seach in begin of string
+    self.assertEqual(util.rfind(string, "T", 0), 0)
+    self.assertEqual(util.rfind(string, "T", 15), 0)
+    self.assertEqual(util.rfind(string, "T"), 0)
+
+    # Seach in end of string
+    self.assertEqual(util.rfind(string, "i", 14), 13)
+    self.assertEqual(util.rfind(string, "i"), 13)
+
+    # Search for last element
+    self.assertEqual(util.rfind(string, "g", 15), 15)
+    self.assertEqual(util.rfind(string, "g"), 15)
+
+    # Search in out of range
+    self.assertEqual(util.rfind(string, "a", 16), -1)
+    self.assertEqual(util.rfind(string, "a", -10), -1)
+
 
 if __name__ == '__main__':
   unittest.main()
