@@ -147,6 +147,25 @@ def decrypt_strings(data: str,
 
 
 def escape_operators(source: str) -> str:
+  """ Add spaces to operators on both sides if spaces not exist.
+
+  Support for single and double operators. If there will bemore operators 
+    in row, then first will split them to double operators or to single if last.
+  List of operators:
+    ['+', '-', '*', '/', '%', '=', '!', '<', '>', '&', '|', '^', '~']
+  Example_1:
+    from: "&abs*abc % abc/ abc +abc^"
+      to: " & abs * abc % abc / abc + abc ^ "
+  Example_2:
+    from: "&&abs**abc %% abc// abc ++abc^^"
+      to: " & abs * abc % abc / abc + abc ^ "
+      
+  Args:
+    data: data to escape.
+
+  Returns:
+    data: escaped data.
+  """
   if not source: return source
   operators = ['+', '-', '*', '/', '%', '=', '!', '<', '>', '&', '|', '^', '~']
   i = 0
@@ -172,6 +191,16 @@ def escape_operators(source: str) -> str:
 
 
 def find_unsupported_syntax(source: str) -> str:
+  """ Search for unsupported syntax.
+
+  Search for: ["++", "--", "->"]
+
+  Args:
+    data: data to search for.
+
+  Returns:
+    data: found unsupported syntax or empty data if not found.
+  """
   unsupported_syntaxes = ["++", "--", "->"]
 
   for unsupported_syntax in unsupported_syntaxes:
