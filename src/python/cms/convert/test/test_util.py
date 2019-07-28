@@ -145,6 +145,33 @@ class TestUtil(unittest.TestCase):
     self.assertEqual(util.rfind(string, "a", 16), -1)
     self.assertEqual(util.rfind(string, "a", -10), -1)
 
+  def test_split_by_positions(self):
+    string = "This is a string"
+
+    # Positions in center of string
+    correct_splited = ["Th", "s ", "s a str", "ng"]
+    splited = util.split_by_positions(string, [2, 5, 13])
+    for i, split in enumerate(splited):
+      self.assertEqual(split, correct_splited[i])
+
+    # Not sorted position
+    correct_splited = ["Th", "s ", "s a str", "ng"]
+    splited = util.split_by_positions(string, [13, 2, 5])
+    for i, split in enumerate(splited):
+      self.assertEqual(split, correct_splited[i])
+
+    # Positions at begind and at end of string
+    correct_splited = ["his is a strin"]
+    splited = util.split_by_positions(string, [0, 15])
+    for i, split in enumerate(splited):
+      self.assertEqual(split, correct_splited[i])
+
+    # Positions aout of range
+    with self.assertRaises(IndexError):
+      util.split_by_positions(string, [0, 15, -1, 6])
+    with self.assertRaises(IndexError):
+      util.split_by_positions(string, [0, 15, 16, 6])
+
 
 if __name__ == '__main__':
   unittest.main()
