@@ -1,4 +1,14 @@
 class _Indent(object):
+  """ Help management with python indent.
+
+  Args:     
+    size: int
+      Size of the indent statement. 
+    count: int
+      The amount of indentation.
+    as_test: str
+      Actual indent in text form.
+  """
 
   def __init__(self, size: int):
     self._size = size
@@ -6,18 +16,44 @@ class _Indent(object):
     self.as_text = ""
 
   def increase(self, count=1):
+    """ Increase indent by givent amount.
+
+    Args:     
+      count: int
+        The amount of indentation.
+    """
     self.count += count
     self._update_text()
 
   def decrease(self, count=1):
+    """ Decrease indent by givent amount.
+
+    Args:     
+      count: int
+        The amount of indentation.
+    """
     self.count = max(self.count - count, 0)
     self._update_text()
 
   def _update_text(self):
+    """ Update index test by values. 
+    
+    Should be called after any change of indent class
+    """
     self.as_text = ' ' * (self._size * self.count)
 
 
 class PythonSource(object):
+  """ Convert scopes tree to python source.
+
+  Args:     
+    as_text: int
+      Python source as string. 
+    _indent: _Indent
+      Current indent.
+    _found_new_line_instruction: bool
+      Helps to keep corret indention when jump over scopes.
+  """
 
   def __init__(self, root_scope: Scope):
     self.as_text = ""
@@ -27,6 +63,11 @@ class PythonSource(object):
     self._convert(root_scope)
 
   def _convert(self, scope: Scope):
+    """ Convert scopes tree to python source.
+
+    Args:     
+      scope: Current scope to work on. 
+    """
     self.as_text += self._indent.as_text + scope.header.header_source + "\n"
 
     if scope.header.type != Header.Type.ROOT:
