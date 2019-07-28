@@ -372,4 +372,29 @@ class Header(object):
 
 
 class Scope(object):
-  pass
+  STATIC_ID = itertools.count()
+
+  def __init__(self,
+               parent: 'Scope',
+               open_statement_position: Position,
+               close_statement_position: Position = None,
+               type: Header.Type = Header.Type.UNKNOWN):
+    self.id = next(Scope.STATIC_ID)
+    self.blocks_of_instructions = BlocksOfInstructions()
+    self.header = Header(open_statement_position.get_index(), type)
+    self.parent = parent
+    self.childs = []
+    self.open_statement_position = Position(position=open_statement_position)
+    if close_statement_position == None:
+      self.close_statement_position = Position(position=open_statement_position)
+    else:
+      self.close_statement_position = Position(
+          position=close_statement_position)
+
+  def process_open(self, open_statement_position: Position) -> 'Scope':
+    self.childs.append(Scope(self, open_statement_position))
+    return self.childs[len(self.childs) - 1]
+
+  def process_close(self, close_statement_position: Position) -> 'Scope':
+    self.close_statement_position = Position(position=close_statement_position)
+    return self.parent
