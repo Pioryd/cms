@@ -1,3 +1,7 @@
+from convert.scope import Scope
+from convert.scope import Header
+
+
 class _Indent(object):
   """ Help management with python indent.
 
