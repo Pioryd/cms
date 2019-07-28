@@ -1,0 +1,7 @@
+Files starts with:
+  'test_' - are tests. 
+  'source_' - files needed for test modules. Second part of each source is the 
+      name of the module. Example 'source_converter' is source of 
+      'test_converter' module.
+      
+Each test can be runned separately, or togeather by module '../run_tests.py'
