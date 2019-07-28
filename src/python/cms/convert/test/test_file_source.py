@@ -178,10 +178,148 @@ class TestPosition(unittest.TestCase):
     self.assertEqual(position.get_line_position(), 22)
 
   def test_set_positions(self):
-    pass
+    position = Position(self.source)
+
+    self.assertTrue(position.move(7))
+    self.assertEqual(position.get_character(), " ")
+
+    # When there's no characters after spaces
+    self.source.str = " " * 5
+    position = Position(self.source)
+    self.assertFalse(position.set_after_spaces())
+    self.assertEqual(position.get_index(), 0)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+
+    # When there's no characters before spaces
+    self.assertTrue(position.go_to_end_of_line())
+    self.assertFalse(position.set_before_spaces())
+    self.assertEqual(position.get_index(), 4)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 5)
+
+    # When there's are characters after spaces
+    self.source.restore()
+    position = Position(self.source)
+    self.assertTrue(position.move(7))
+    self.assertTrue(position.set_after_spaces())
+    self.assertEqual(position.get_index(), 13)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 14)
+    self.assertEqual(position.get_character(), "s")
+
+    # When there's are characters before spaces
+    self.assertTrue(position.set_before_spaces())
+    self.assertEqual(position.get_index(), 6)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 7)
+    self.assertEqual(position.get_character(), "s")
+
+    # With default argument
+    self.assertTrue(position.go_to_begin_of_line())
+    self.assertEqual(position.get_index(), 0)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+
+    # With default argument
+    self.assertTrue(position.go_to_end_of_line())
+    self.assertEqual(position.get_index(), 19)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 20)
+
+    # With given arguments, go through some different variations
+    self.assertTrue(position.go_to_begin_of_line(6))
+    self.assertEqual(position.get_character(), "T")
+    self.assertEqual(position.get_index(), 61)
+    self.assertEqual(position.get_line_number(), 6)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.go_to_begin_of_line(10))
+    self.assertEqual(position.get_index(), 157)
+    self.assertEqual(position.get_line_number(), 10)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.go_to_begin_of_line(2))
+    self.assertEqual(position.get_character(), "T")
+    self.assertEqual(position.get_index(), 20)
+    self.assertEqual(position.get_line_number(), 2)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.go_to_begin_of_line(5))
+    self.assertEqual(position.get_index(), 60)
+    self.assertEqual(position.get_line_number(), 5)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.go_to_begin_of_line(1))
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+
+    # With given arguments, go through some different variations
+    self.assertTrue(position.go_to_end_of_line(1))
+    self.assertEqual(position.get_index(), 19)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 20)
+    #
+    self.assertTrue(position.go_to_end_of_line(5))
+    self.assertEqual(position.get_index(), 60)
+    self.assertEqual(position.get_line_number(), 5)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.go_to_end_of_line(10))
+    self.assertEqual(position.get_index(), 178)
+    self.assertEqual(position.get_line_number(), 10)
+    self.assertEqual(position.get_line_position(), 22)
+
+    # Go to not exist lines
+    self.assertFalse(position.go_to_begin_of_line(200))
+    self.assertEqual(position.get_index(), 178)
+    self.assertEqual(position.get_line_number(), 10)
+    self.assertEqual(position.get_line_position(), 22)
+    #
+    self.assertFalse(position.go_to_end_of_line(1011))
+    self.assertEqual(position.get_index(), 178)
+    self.assertEqual(position.get_line_number(), 10)
+    self.assertEqual(position.get_line_position(), 22)
+
+    # Find bound right parenthesis containing others bounded parentheses
+    self.assertTrue(position.go_to_begin_of_line(9))
+    self.assertTrue(position.move(5))
+    self.assertEqual(position.get_line_position(), 6)
+    self.assertEqual(position.get_character(), "(")
+    #
+    self.assertTrue(position.set_at_right_bound_parenthesis())
+    self.assertEqual(position.get_line_position(), 27)
+    self.assertEqual(position.get_character(), ")")
+
+    # Find bound left parenthesis containing others bounded parentheses
+    self.assertTrue(position.set_at_left_bound_parenthesis())
+    self.assertEqual(position.get_line_position(), 6)
+    self.assertEqual(position.get_character(), "(")
+
+    # When bound parenthesis not exist
+    self.assertTrue(position.go_to_begin_of_line(8))
+    self.assertTrue(position.move(16))
+    self.assertFalse(position.set_at_left_bound_parenthesis())
+    self.assertEqual(position.get_line_position(), 17)
+    #
+    self.assertTrue(position.go_to_begin_of_line(10))
+    self.assertTrue(position.move(16))
+    self.assertFalse(position.set_at_right_bound_parenthesis())
+    self.assertEqual(position.get_line_position(), 17)
+
+    # When index is not set at parenthesis
+    self.assertTrue(position.go_to_begin_of_line(6))
+    self.assertFalse(position.set_at_left_bound_parenthesis())
+    self.assertFalse(position.set_at_right_bound_parenthesis())
 
   def test_to_string(self):
-    pass
+    position = Position(self.source)
+
+    position.go_to_end_of_line(2)
+    self.assertEqual(position.to_string(), ("\nPosition:"
+                                            "\n\tLine number: 2"
+                                            "\n\tLine position: 20"
+                                            "\n\tIndex: 39"))
 
 
 if __name__ == '__main__':
