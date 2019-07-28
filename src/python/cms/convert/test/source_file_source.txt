@@ -1,0 +1,10 @@
+This is      string
+This is second line
+This is third line
+
+
+This is line number 6
+This is line number 7
+This is l(ne )um)er 8
+This (is (line) ((number))) 9
+This is line num(e( 10
