@@ -104,3 +104,37 @@ def decrypt_strings(data: str,
       data = util.replace(data, encrypted_string.position,
                           len(encrypted_string.data), 1, encrypted_string.data)
   return data
+
+
+def escape_operators(source: str) -> str:
+  if not source: return source
+  operators = ['+', '-', '*', '/', '%', '=', '!', '<', '>', '&', '|', '^', '~']
+  i = 0
+  while i < len(source):
+    if source[i] in operators:
+      if i - 1 < 0 or source[i - 1] != " ":
+        source = util.insert(source, i, " ")
+        i += 1
+
+      # check if it's double operator
+      if i + 1 < len(source) and source[i + 1] in operators:
+        #source = util.insert(source, i + 1, " ")
+        i += 1
+
+      if i == (len(source) - 1):
+        source += (" ")
+        break
+      elif source[i + 1] != " ":
+        source = util.insert(source, i + 1, " ")
+        i += 1
+    i += 1
+  return source
+
+
+def find_unsupported_syntax(source: str) -> str:
+  unsupported_syntaxes = ["++", "--", "->"]
+
+  for unsupported_syntax in unsupported_syntaxes:
+    if source.find(unsupported_syntax) != -1: return unsupported_syntax
+
+  return ""
