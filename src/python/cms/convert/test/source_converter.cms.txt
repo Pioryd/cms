@@ -1,0 +1,21 @@
+#include <cms>
+
+struct MyStruct_1 {}
+cms::sometype t_5 = INITIALIZER_LIST("heel", "check", "top")
+struct MyStruct_2 : OtherStruct, ParentStruct {
+  struct InnerStruct {
+    cms::sometype t_1 = INITIALIZER_LIST(123, 234, 456);
+    int a = 5;
+    cms::string var = 7;
+  }
+  void fun(const std::string& name, int* type, char val) {
+    while(a > 5 && c <= 9 || (a == 12 && c < d)) {
+      print("hello");
+    }
+  }
+}
+// This is string
+int a = 6; // hello 
+void fun2 (int a) {
+  cms::string var = "hello"; // this is string
+}

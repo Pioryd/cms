@@ -1,0 +1,25 @@
+
+import cms
+class MyStruct_1(object):
+  pass
+
+t_5 = ["heel", "check", "top"]
+class MyStruct_2(OtherStruct, ParentStruct):
+  class InnerStruct(object):
+    t_1 = [123, 234, 456]
+    a = 5
+    var = 7
+
+  def fun(name, type, val):
+    while(a > 5 and c <= 9 or (a == 12 and c < d)):
+      print("hello")
+
+
+
+# This is string
+a = 6
+# hello
+def fun2(a):
+  var = "hello"
+  # this is string
+
