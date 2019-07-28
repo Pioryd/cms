@@ -10,11 +10,27 @@ from convert.file_source import Position
 
 
 class BlocksOfInstructions(object):
+  """ Constains converted blocks of instructions from cms to python syntax.
+  
+  Attributes:
+    blocks: dict[position: int, block_of_instructions: list[instruction: str]]
+      position: index position between scope childs (next_child_index - 1)
+      block_of_instructions: list of instructions as python syntax
+  """
 
   def __init__(self):
     self.blocks = {}
 
   def add(self, position: int, source_of_block_of_instructions: str):
+    """ Collect block of instrunctions and convert them.
+    
+    Convert instructions from cms to python syntax.
+
+    Args:
+      position: index position between scope childs (next_child_index - 1)
+      source_of_block_of_instructions: source of blocks of instruction in
+        cms syntax
+    """
     self._split_block_of_instructions(position, source_of_block_of_instructions)
     self._convert_includes(position)
     self._convert_comments(position)
@@ -23,6 +39,13 @@ class BlocksOfInstructions(object):
 
   def _split_block_of_instructions(self, position: int,
                                    source_of_block_of_instructions: str):
+    """ Split block of instructions to single instructions.
+    
+    Args:
+      position: index position between scope childs (next_child_index - 1)
+      source_of_block_of_instructions: source of blocks of instruction in
+        cms syntax.
+    """
     # Split instructions by character ';'. To do that, we have have to first add
     # ';' to comments and includes'.
 
@@ -123,6 +146,14 @@ class BlocksOfInstructions(object):
         block_of_instructions = block_of_instructions[:-1]
 
   def _convert_includes(self, position: int):
+    """ Convert includes.
+
+    Example:
+      ["#include <cms>"] -> ["import cms"]
+    
+    Args:
+      position: index position between scope childs (next_child_index - 1)
+    """
     block_of_instructions = self.blocks[position]
 
     cms_include_statement = "#include"
@@ -141,6 +172,14 @@ class BlocksOfInstructions(object):
         block_of_instructions[i] = instruction
 
   def _convert_comments(self, position: int):
+    """ Convert comments.
+
+    Example:
+      ["//"] -> ["#"]
+    
+    Args:
+      position: index position between scope childs (next_child_index - 1)
+    """
     block_of_instructions = self.blocks[position]
 
     for i, instruction in enumerate(block_of_instructions):
@@ -151,6 +190,14 @@ class BlocksOfInstructions(object):
         block_of_instructions[i] = instruction
 
   def _convert_initializer_list(self, position: int):
+    """ Convert inicializer list to python syntax.
+
+    Example:
+      "INITIALIZER_LIST(1, 4, 7,...n)" -> "[1, 4, 7,...n]"
+    
+    Args:
+      position: index position between scope childs (next_child_index - 1)
+    """
     init_list_syntax = "INITIALIZER_LIST"  # lenght = 16
     init_list_syntax_hash = "#(!&$%!)*$&%^@*%"  # lenght = 16
 
@@ -191,6 +238,14 @@ class BlocksOfInstructions(object):
         block_of_instructions[i] = instruction
 
   def _convert_inicializations(self, position: int):
+    """ Convert inicializations to python syntax.
+
+    Example:
+      "int a = 5" -> "a = 5"
+    
+    Args:
+      position: index position between scope childs (next_child_index - 1)
+    """
     reserved_cpp_type_qualifiers = ["const", "auto"]
     reserved_cpp_types = [
         "void", "bool", "char", "signed char", "unsigned char", "wchar_t",
