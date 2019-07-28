@@ -48,6 +48,49 @@ class TestUtil(unittest.TestCase):
     with self.assertRaises(IndexError):
       util.replace(string, 4, -100, 10, replace)
 
+  def test_erase(self):
+    string = "This is a string"
+
+    # When sub-string in center of string
+    self.assertEqual(util.erase(string, 4, 6), "Thisstring")
+    self.assertEqual(util.erase(string, 4, 0), string)
+    # When sub-string in begin of string
+    self.assertEqual(util.erase(string, 0, 5), "is a string")
+    # When sub-string in end of string
+    self.assertEqual(util.erase(string, 9, 7), "This is a")
+
+    # Default value
+    self.assertEqual(util.erase(string, 4), "This")
+
+    # When index of sub-string or part of sub-string is out of range
+    with self.assertRaises(IndexError):
+      util.erase(string, 4, 50)
+    with self.assertRaises(IndexError):
+      util.erase(string, -10, 2)
+    with self.assertRaises(IndexError):
+      util.erase(string, 4, -20)
+
+  def test_substr(self):
+    string = "This is a string"
+
+    # When sub-string in center of string
+    self.assertEqual(util.substr(string, 4, 6), " is a ")
+    self.assertEqual(util.substr(string, 4, 0), string)
+    self.assertEqual(util.substr(string, 4, -20), " is a string")
+    # When sub-string in begin of string
+    self.assertEqual(util.substr(string, 0, 5), "This ")
+    # When sub-string in end of string
+    self.assertEqual(util.substr(string, 9, 7), " string")
+
+    # Default value
+    self.assertEqual(util.substr(string, 4), " is a string")
+
+    # When index of sub-string or part of sub-string is out of range
+    with self.assertRaises(IndexError):
+      util.substr(string, 4, 50)
+    with self.assertRaises(IndexError):
+      util.substr(string, -10, 2)
+
 
 if __name__ == '__main__':
   unittest.main()
