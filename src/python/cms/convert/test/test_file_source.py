@@ -65,19 +65,117 @@ class TestSource(unittest.TestCase):
 
 
 class TestPosition(unittest.TestCase):
+  WORKING_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+  TEST_SOURCE_PATH = WORKING_DIRECTORY + "/source_file_source.txt"
 
   @classmethod
   def setUpClass(self):
-    pass
+    self.source = Source(self.TEST_SOURCE_PATH)
 
   def setUp(self):
-    pass
+    self.source.restore()
 
   def test_init(self):
-    pass
+    with self.assertRaises(Exception):
+      Position(None)
+    with self.assertRaises(Exception):
+      Position(None, None)
+
+    position = Position(self.source)
+
+    self.assertEqual(position.get_index(), position._index)
+    self.assertEqual(position.get_line_number(), position._line_number)
+    self.assertEqual(position.get_line_position(), position._line_position)
+
+    self.assertEqual(position.get_index(), 0)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+
+    self.assertTrue(position.move(5))
+    position_2 = Position(position=position)
+    self.assertEqual(position.get_index(), position_2.get_index())
+    self.assertEqual(position.get_line_number(), position_2.get_line_number())
+    self.assertEqual(position.get_line_position(),
+                     position_2.get_line_position())
 
   def test_move_and_rmove(self):
-    pass
+    position = Position(self.source)
+
+    first_line_data = "This is test string\n"
+    first_line_lenght = len(first_line_data)
+
+    # Move with default parameter
+    self.assertTrue(position.move())
+    self.assertEqual(position.get_index(), 1)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 2)
+
+    # Move with given parameter
+    self.assertTrue(position.move(2))
+    self.assertEqual(position.get_index(), 3)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 4)
+
+    # Move throught new line
+    self.assertTrue(position.move(first_line_lenght))
+    self.assertEqual(position.get_index(), first_line_lenght + 3)
+    self.assertEqual(position.get_line_number(), 2)
+    self.assertEqual(position.get_line_position(), 4)
+
+    # Rmove throught new line
+    self.assertTrue(position.rmove(first_line_lenght))
+    self.assertEqual(position.get_index(), 3)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 4)
+
+    # Rmove with given parameter
+    self.assertTrue(position.rmove(2))
+    self.assertEqual(position.get_index(), 1)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 2)
+
+    # Rmove with default parameter
+    self.assertTrue(position.rmove())
+    self.assertEqual(position.get_index(), 0)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+
+    # Test move throught many new lines
+    self.assertTrue(position.move(61))
+    self.assertEqual(position.get_index(), 61)
+    self.assertEqual(position.get_line_number(), 6)
+    self.assertEqual(position.get_line_position(), 1)
+
+    # Test rmove throught many new lines
+    self.assertTrue(position.rmove())
+    self.assertEqual(position.get_line_number(), 5)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.rmove())
+    self.assertEqual(position.get_line_number(), 4)
+    self.assertEqual(position.get_line_position(), 1)
+    #
+    self.assertTrue(position.rmove())
+    self.assertEqual(position.get_line_number(), 3)
+    self.assertEqual(position.get_line_position(), 19)
+    #
+    self.assertTrue(position.rmove(58))
+    self.assertEqual(position.get_index(), 0)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+
+    # Test move outside source range
+    position = Position(self.source)
+    self.assertFalse(position.rmove())
+    self.assertEqual(position.get_index(), 0)
+    self.assertEqual(position.get_line_number(), 1)
+    self.assertEqual(position.get_line_position(), 1)
+    self.assertTrue(position.go_to_end_of_line(10))
+    #
+    self.assertFalse(position.move())
+    self.assertEqual(position.get_index(), 178)
+    self.assertEqual(position.get_line_number(), 10)
+    self.assertEqual(position.get_line_position(), 22)
 
   def test_set_positions(self):
     pass
