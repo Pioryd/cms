@@ -8,6 +8,16 @@ import convert.cms_syntax as cms_syntax
 
 
 class Converter(object):
+  """ Convert file from cms to python.
+
+  Attributes:
+    source: Source
+      Source of cms file to convert.
+    root_scope: Scope
+      Root scope of converted cms file.
+    python_source: PythonSource
+      Converted python source.
+  """
 
   def __init__(self, file_path: str):
     self.source = Source(file_path)
@@ -17,6 +27,11 @@ class Converter(object):
     self.python_source = None
 
   def convert(self):
+    """ Convert cms source to python source.
+
+    Raises:
+      Exception: When source cannot be converted.
+    """
     # Encrypt all strings to make enable search scopes by brackets. Otherwhise
     # brackets from strings can break search algorithm.
     self.source.str, encrypted_strings = cms_syntax.encrypt_strings(
@@ -46,9 +61,19 @@ class Converter(object):
     self.python_source = PythonSource(self.root_scope)
 
   def get_python_source(self) -> str:
+    """ Return converted python source.
+
+    Returns:
+      str: Converted python source.
+    """
     return self.python_source.as_text
 
   def _create_scopes_by_brackets(self):
+    """ Create scope by brackets '{}'. 
+    
+    Raises:
+      Exception: When occure problem while creating scopes.
+    """
     current_position = Position(self.source)
     current_scope = self.root_scope
     is_open = False
@@ -67,11 +92,27 @@ class Converter(object):
     if is_open: raise Exception("One or more brackets missing.")
 
   def _set_headers_to_scopes(self, childs: 'list[Scope]'):
+    """ Set recursive headers to scopes.
+
+    Args:
+      childs: scope childs.
+
+    Raises:
+      Exception: When occure problem while settup header.
+    """
     for child in childs:
       self._set_header_to_scope(child)
       self._set_headers_to_scopes(child.childs)
 
   def _set_header_to_scope(self, scope: Scope):
+    """ Set header to scope
+
+    Args:
+      scope: scope to set header.
+
+    Raises:
+      Exception: When occure problem while settup header.
+    """
     current_position = Position(position=scope.open_statement_position)
 
     #  *  <-     *
@@ -180,11 +221,21 @@ class Converter(object):
         scope_header_start)
 
   def _set_instructions_to_scopes(self, childs: 'list<Scope>'):
+    """ Set recursive instructions to scopes.
+
+    Args:
+      childs: scopes to set instructions.
+    """
     for child in childs:
       self._set_instructions_to_scope(child)
       self._set_instructions_to_scopes(child.childs)
 
   def _set_instructions_to_scope(self, scope: Scope):
+    """ Set instructions to scope.
+
+    Args:
+      scope: scope to set instructions.
+    """
     # Position of instruction is [right_side_child_index - 1]
     #            ins[-1]       child[0]    ins[0]     child[1]     ins[2]
     # 'fun(){ INSTRUCTIONS while(){...} INSTRUCTION while(){...} INSTRUCTIONS}'
