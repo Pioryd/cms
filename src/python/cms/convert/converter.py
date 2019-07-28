@@ -180,7 +180,95 @@ class Converter(object):
         scope_header_start)
 
   def _set_instructions_to_scopes(self, childs: 'list<Scope>'):
-    pass
+    for child in childs:
+      self._set_instructions_to_scope(child)
+      self._set_instructions_to_scopes(child.childs)
 
   def _set_instructions_to_scope(self, scope: Scope):
-    pass
+    # Position of instruction is [right_side_child_index - 1]
+    #            ins[-1]       child[0]    ins[0]     child[1]     ins[2]
+    # 'fun(){ INSTRUCTIONS while(){...} INSTRUCTION while(){...} INSTRUCTIONS}'
+
+    #current_position = Position(self.source)
+
+    # Because CloseStatement '};' is set at ';'. It will be set to '}' later.
+    fix_struct_close_statement_index = 0
+
+    # Because we dont want close and open statements in sub-string.
+    fix_open_statement_position = 1
+    fix_close_statement_position = 1
+    fix_header_start_position = 1
+
+    if not scope.childs:
+      if scope.header.type == Header.Type.STRUCT:
+        fix_struct_close_statement_index = 1
+
+      index = (scope.open_statement_position.get_index() +
+               fix_open_statement_position)
+      lenght = ((1) + scope.close_statement_position.get_index() -
+                scope.open_statement_position.get_index() -
+                fix_open_statement_position - fix_close_statement_position -
+                fix_struct_close_statement_index)
+
+      if scope.header.type == Header.Type.ROOT:
+        index -= fix_open_statement_position
+        lenght += fix_open_statement_position
+
+      instructions = ""
+      if lenght > 0:
+        instructions = util.substr(self.source.str, index, lenght) + "\n"
+        instructions = instructions.strip()
+      if not instructions: instructions = "pass"
+      scope.blocks_of_instructions.add(-1, instructions)
+
+    i = 0
+    while i < len(scope.childs):
+      current_child = scope.childs[i]
+
+      if i == 0:
+        index = (scope.open_statement_position.get_index() +
+                 fix_open_statement_position)
+        lenght = ((1) + current_child.header.index_at_main_source -
+                  scope.open_statement_position.get_index() -
+                  fix_open_statement_position - fix_header_start_position)
+
+        if scope.header.type == Header.Type.ROOT:
+          index -= fix_open_statement_position
+
+        if lenght > 0:
+          instructions = util.substr(self.source.str, index, lenght) + "\n"
+          instructions = instructions.strip()
+          scope.blocks_of_instructions.add(i - 1, instructions)
+      else:
+        previous_child = scope.childs[i - 1]
+
+        index = (previous_child.close_statement_position.get_index() +
+                 fix_open_statement_position)
+        lenght = ((1) + current_child.header.index_at_main_source -
+                  previous_child.close_statement_position.get_index() -
+                  fix_open_statement_position - fix_header_start_position)
+
+        if lenght > 0:
+          instructions = util.substr(self.source.str, index, lenght) + "\n"
+          instructions = instructions.strip()
+          scope.blocks_of_instructions.add(i - 1, instructions)
+
+      if i == (len(scope.childs) - 1):
+        if scope.header.type == Header.Type.STRUCT:
+          fix_struct_close_statement_index = 1
+
+        index = (current_child.close_statement_position.get_index() +
+                 fix_open_statement_position)
+        lenght = ((1) + scope.close_statement_position.get_index() -
+                  current_child.close_statement_position.get_index() -
+                  fix_struct_close_statement_index -
+                  fix_open_statement_position - fix_close_statement_position)
+
+        if scope.header.type == Header.Type.ROOT:
+          lenght += fix_open_statement_position
+
+        if lenght > 0:
+          instructions = util.substr(self.source.str, index, lenght) + "\n"
+          instructions = instructions.strip()
+          scope.blocks_of_instructions.add(len(scope.childs), instructions)
+      i += 1
