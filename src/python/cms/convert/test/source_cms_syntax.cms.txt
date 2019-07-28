@@ -1,0 +1,10 @@
+#define some_define
+
+// hello " 'w' "abc" // "
+auto string = "'string//'' \" '";
+auto character = 'c'; // comment 'foo' / "//"
+auto a = 1 + 2;
+auto char_array = {'a', 'b', 'c'};
+a++;
+auto string_array = {"abc", "zxc", "poi"}
+// end of file

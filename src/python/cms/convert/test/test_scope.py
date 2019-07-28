@@ -68,9 +68,33 @@ class TestHeader(unittest.TestCase):
 
 
 class TestScope(unittest.TestCase):
+  working_directory = os.path.dirname(os.path.abspath(__file__))
+  test_source_path = working_directory + "/source_cms_syntax.cms.txt"
 
   def test_open_and_close(self):
-    pass
+    source = Source(self.test_source_path)
+
+    root_scope = Scope(None, Position(source))
+    # 1# child
+    scope = root_scope.process_open(Position(source))
+    scope = scope.process_close(Position(source))
+    # 2# child
+    scope = scope.process_open(Position(source))
+    scope = scope.process_close(Position(source))
+    # 3# child
+    scope = scope.process_open(Position(source))
+    scope = scope.process_close(Position(source))
+    # 4# child
+    scope = scope.process_open(Position(source))
+    scope = scope.process_close(Position(source))
+
+    self.assertEqual(len(root_scope.childs), 4)
+    if __name__ == '__main__':
+      self.assertEqual(root_scope.id, 0)
+      self.assertEqual(root_scope.childs[0].id, 1)
+      self.assertEqual(root_scope.childs[1].id, 2)
+      self.assertEqual(root_scope.childs[2].id, 3)
+      self.assertEqual(root_scope.childs[3].id, 4)
 
 
 if __name__ == '__main__':
