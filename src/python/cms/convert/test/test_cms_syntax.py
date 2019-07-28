@@ -194,10 +194,29 @@ class TestCmsSyntax(unittest.TestCase):
     self.assertEqual(decrypted_data, " ")
 
   def test_escape_operators(self):
-    pass
+    # Only single operators
+    string = "&abs*abc % abc/ abc +abc^"
+    self.assertEqual(cms_syntax.escape_operators(string),
+                     " & abs * abc % abc / abc + abc ^ ")
+
+    # Only double operators
+    string = "&&abs**abc %% abc// abc ++abc^^"
+    self.assertEqual(cms_syntax.escape_operators(string),
+                     " && abs ** abc %% abc // abc ++ abc ^^ ")
+
+    # Some others variants
+    string = "&&&abs****abc %%%%% abc// abc +abc^^"
+    self.assertEqual(cms_syntax.escape_operators(string),
+                     " && & abs ** ** abc %% %% % abc // abc + abc ^^ ")
+
+    # Empty string
+    self.assertEqual(cms_syntax.escape_operators(""), "")
+    self.assertEqual(cms_syntax.escape_operators(" "), " ")
 
   def test_find_unsupported_syntax(self):
-    pass
+    string = "abs--abs"
+
+    self.assertEqual(cms_syntax.find_unsupported_syntax(string), "--")
 
 
 if __name__ == '__main__':
