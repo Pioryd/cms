@@ -8,7 +8,5 @@
 
 #define BIND(...) std::bind(__VA_ARGS__)
 #define INITIALIZER_LIST(...) \
-  {                           \
-    __VA_ARGS__               \
-  }
-#endif // #ifndef FW_CMS_DECLARATIONS_H
+  { __VA_ARGS__ }
+#endif  // #ifndef FW_CMS_DECLARATIONS_H
