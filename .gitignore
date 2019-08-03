@@ -1,2 +1,9 @@
 # Python
 __pycache__
+
+# Visual Studio Code
+.vscode
+
+# Visual Studio IDE
+.vs
+CMakeSettings.json
