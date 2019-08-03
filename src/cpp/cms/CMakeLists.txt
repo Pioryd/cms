@@ -2,4 +2,5 @@
 set(CMS_SOURCES ${CMS_SOURCES}
  ${CMAKE_CURRENT_LIST_DIR}/string.h
  ${CMAKE_CURRENT_LIST_DIR}/string.cpp
+ ${CMAKE_CURRENT_LIST_DIR}/immutable__.h
 )
