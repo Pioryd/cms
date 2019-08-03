@@ -1,0 +1,4 @@
+#ifndef FW_CMS_DECLARATIONS_H
+#define FW_CMS_DECLARATIONS_H
+
+#endif // #ifndef FW_CMS_DECLARATIONS_H
