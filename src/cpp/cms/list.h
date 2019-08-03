@@ -20,47 +20,63 @@ public:
   */
   immutable_list(const immutable_list &list_to_copy) = delete;
 
-  operator std::vector<T> &() const { return std::vector<T>; };
-  operator const std::vector<T> &() { return std::vector<T>; };
+  operator std::vector<T> &() const { return *object_(); };
+  operator const std::vector<T> &() { return *object_(); };
 
-  T operator[](unsigned i) const { return T; }
-  T &operator[](unsigned i) { return T; }
+  T operator[](unsigned i) const { return (*object_())[i]; }
+  T &operator[](unsigned i) { return (*object_())[i]; }
 
-  void clear() {}
+  void clear() { object_()->clear(); }
 
-  void append(T element) {}
+  void append(T element) { object_()->push_back(element); }
 
   void extend(immutable_list<T> &list)
   {
+    object_()->insert(object_()->end(), list.object_()->begin(),
+                      list.object_()->end());
   }
 
   void insert(int64_t position, T element)
   {
+    object_()->insert(object_()->begin() + position, element);
   }
 
   void remove(T element)
   {
+    it = std::find(object_()->begin(), object_()->end(), element);
+    if (it != object_()->end())
+      object_()->erase(it);
   }
 
   void pop(int64_t position)
   {
+    object_()->erase(object_()->begin() + position);
   }
 
   int64_t index(T element)
   {
-    return 0;
+    it = std::find(object_()->begin(), object_()->end(), element);
+    if (it != object_()->end())
+      return -1;
+    return it - object_()->begin();
   }
 
   int64_t count(T element)
   {
-    return 0;
+    return std::count(object_()->begin(), object_()->end(), element);
   }
 
   void sort(std::function<bool(T &)> sort = nullptr, bool reverse = false)
   {
+    if (sort)
+      std::sort(object_()->begin(), object_()->end(), sort);
+    else if (reverse == true)
+      std::reverse(object_()->begin(), object_()->end());
+    else
+      std::sort(object_()->begin(), object_()->end());
   }
 
-  void reverse() {}
+  void reverse() { std::reverse(object_()->begin(), object_()->end()); }
 
 private:
   friend immutable_list;
