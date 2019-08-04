@@ -209,3 +209,37 @@ def find_unsupported_syntax(data: str) -> str:
 
   return ""
 
+
+def remove_macros(data: str) -> str:
+  """ Remove macros.
+
+  Macros: "CMS_BEGIN" and "CMS_END"
+
+  Args:
+    data: data to remove macros.
+
+  Returns:
+    data: data with removed macros.
+  """
+  encryped_cms_begin = "%^$!$#@@#"
+  encryped_cms_end = "!*$%#@%"
+
+  encrypted_data, encrypted_strings = encrypt_strings(data)
+
+  encrypted_data = encrypted_data.replace("CMS_BEGIN", encryped_cms_begin)
+  encrypted_data = encrypted_data.replace("CMS_END", encryped_cms_end)
+
+  decrypted_data = decrypt_strings(encrypted_data, encrypted_strings)
+
+  while True:
+    found = decrypted_data.find(encryped_cms_begin)
+    if found == -1: break
+    decrypted_data = util.erase(decrypted_data, found,
+                                decrypted_data.find(')', found) - found + 1)
+
+  while True:
+    found = decrypted_data.find(encryped_cms_end)
+    if found == -1: break
+    decrypted_data = util.erase(decrypted_data, found,
+                                decrypted_data.find(')', found) - found + 1)
+  return decrypted_data

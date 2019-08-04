@@ -218,6 +218,19 @@ class TestCmsSyntax(unittest.TestCase):
 
     self.assertEqual(cms_syntax.find_unsupported_syntax(string), "--")
 
+  def test_remove_macros(self):
+    string = ('// CMS_BEGIN(module, "args")\n'
+              'CMS_BEGIN(module, "args")\n'
+              '// CMS_END()\n'
+              'CMS_END()\n')
+    string_with_removed_macros = ('// CMS_BEGIN(module, "args")\n'
+                                  '\n'
+                                  '// CMS_END()\n'
+                                  '\n')
+
+    self.assertEqual(cms_syntax.remove_macros(string),
+                     string_with_removed_macros)
+
 
 if __name__ == '__main__':
   unittest.main()
