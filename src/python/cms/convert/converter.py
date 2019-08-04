@@ -32,6 +32,9 @@ class Converter(object):
     Raises:
       Exception: When source cannot be converted.
     """
+    # Remove macros
+    self.source.str = cms_syntax.remove_macros(self.source.str)
+
     # Encrypt all strings to make enable search scopes by brackets. Otherwhise
     # brackets from strings can break search algorithm.
     self.source.str, encrypted_strings = cms_syntax.encrypt_strings(
