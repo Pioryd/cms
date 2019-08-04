@@ -3,7 +3,7 @@ from convert.converter import Converter
 
 
 def convert_file(full_file_name: str) -> str:
-  if not '.cms' in full_file_name:
+  if not '.cpp' in full_file_name:
     return "Wrong file type: [{}].".format(full_file_name)
   if not os.path.isfile(full_file_name):
     return "File doesn't exist: [{}].".format(full_file_name)
