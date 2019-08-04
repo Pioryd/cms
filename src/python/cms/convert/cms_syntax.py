@@ -209,4 +209,3 @@ def find_unsupported_syntax(data: str) -> str:
 
   return ""
 
-  return ""
