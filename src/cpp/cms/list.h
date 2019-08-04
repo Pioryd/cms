@@ -12,9 +12,15 @@ class immutable_list : public immutable__<std::vector<T>> {
   immutable_list() : immutable__(new std::vector<T>) {}
   immutable_list(std::initializer_list<T> init_list)
       : immutable__(new std::vector<T>(init_list)) {}
-  /* Cpp have 2 types of initialization:
-      1) MyClass obj(another_obj); // Python COPY
-      2) MyClass obj = another_obj; // Python REFERENCE
+  /* Cpp have 3 types of syntax initialization by copy constructor:
+      1) MyClass obj(another_obj);  //  Cpp:    copy
+                                    //  Python: ----
+      2) MyClass obj = MyClass(another_obj); // Cpp:    copy
+                                             // Python: copy
+      3) MyClass obj = another_obj; //  Cpp:    copy
+                                    //  Python: reference
+
+    In that case use return value as function parameter.
   */
   immutable_list(const immutable_list& list_to_copy) = delete;
 

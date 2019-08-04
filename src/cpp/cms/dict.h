@@ -13,9 +13,15 @@ class immutable_dict : public immutable__<std::map<T, U>> {
   immutable_dict() : immutable__(new std::map<T, U>) {}
   immutable_dict(std::initializer_list<std::pair<const T, U>> init_list)
       : immutable__(new std::map<T, U>(init_list)) {}
-  /* Cpp have 2 types of initialization:
-      1) MyClass obj(another_obj); // Python COPY
-      2) MyClass obj = another_obj; // Python REFERENCE
+  /* Cpp have 3 types of syntax initialization by copy constructor:
+      1) MyClass obj(another_obj);  //  Cpp:    copy
+                                    //  Python: ----
+      2) MyClass obj = MyClass(another_obj); // Cpp:    copy
+                                             // Python: copy
+      3) MyClass obj = another_obj; //  Cpp:    copy
+                                    //  Python: reference
+
+    In that case use return value as function parameter.
   */
   immutable_dict(const immutable_dict& list_to_copy) = delete;
 
