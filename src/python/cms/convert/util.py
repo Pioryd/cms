@@ -64,7 +64,7 @@ def erase(string: str, sub_index: int, sub_lenght: int = -1) -> str:
   Raises:
     IndexError: If sub-string or part of sub-string is out of range.
   """
-  if sub_lenght == 0: return string
+  if sub_lenght == 0 or sub_lenght < -1: return string
   if sub_lenght == -1: sub_lenght = len(string) - sub_index
 
   if (sub_index < 0 or sub_index >= len(string) or
