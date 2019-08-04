@@ -43,8 +43,8 @@ def encrypt_strings(data: str,
       strings with types given in list [types_to_encrypt]
 
   Returns:
-    data: encrypted data.
-    encrypted_strings: encrypted strings.
+    str: encrypted data.
+    List[EncryptedString]: encrypted_strings: encrypted strings.
   """
   encrypted_strings = []  # List[EncryptedString]
   type_of_found_string = EncryptedString.Type.NONE
@@ -129,7 +129,7 @@ def decrypt_strings(data: str,
       strings with types given in list[types_to_decrypt]
 
   Returns:
-    data: decrypted data.
+    str: decrypted data.
   """
   for encrypted_string in encrypted_strings:
     if encrypted_string.position >= len(data):
@@ -146,7 +146,7 @@ def decrypt_strings(data: str,
   return data
 
 
-def escape_operators(source: str) -> str:
+def escape_operators(data: str) -> str:
   """ Add spaces to operators on both sides if spaces not exist.
 
   Support for single and double operators. If there will bemore operators 
@@ -164,33 +164,33 @@ def escape_operators(source: str) -> str:
     data: data to escape.
 
   Returns:
-    data: escaped data.
+    str: escaped data.
   """
-  if not source: return source
+  if not data: return data
   operators = ['+', '-', '*', '/', '%', '=', '!', '<', '>', '&', '|', '^', '~']
   i = 0
-  while i < len(source):
-    if source[i] in operators:
-      if i - 1 < 0 or source[i - 1] != " ":
-        source = util.insert(source, i, " ")
+  while i < len(data):
+    if data[i] in operators:
+      if i - 1 < 0 or data[i - 1] != " ":
+        data = util.insert(data, i, " ")
         i += 1
 
       # check if it's double operator
-      if i + 1 < len(source) and source[i + 1] in operators:
-        #source = util.insert(source, i + 1, " ")
+      if i + 1 < len(data) and data[i + 1] in operators:
+        #data = util.insert(data, i + 1, " ")
         i += 1
 
-      if i == (len(source) - 1):
-        source += (" ")
+      if i == (len(data) - 1):
+        data += (" ")
         break
-      elif source[i + 1] != " ":
-        source = util.insert(source, i + 1, " ")
+      elif data[i + 1] != " ":
+        data = util.insert(data, i + 1, " ")
         i += 1
     i += 1
-  return source
+  return data
 
 
-def find_unsupported_syntax(source: str) -> str:
+def find_unsupported_syntax(data: str) -> str:
   """ Search for unsupported syntax.
 
   Search for: ["++", "--", "->"]
@@ -199,11 +199,14 @@ def find_unsupported_syntax(source: str) -> str:
     data: data to search for.
 
   Returns:
-    data: found unsupported syntax or empty data if not found.
+    str: 
+      found unsupported syntax or empty data if not found.
   """
   unsupported_syntaxes = ["++", "--", "->"]
 
   for unsupported_syntax in unsupported_syntaxes:
-    if source.find(unsupported_syntax) != -1: return unsupported_syntax
+    if data.find(unsupported_syntax) != -1: return unsupported_syntax
+
+  return ""
 
   return ""
