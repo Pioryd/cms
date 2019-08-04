@@ -137,9 +137,10 @@ class Converter(object):
 
       #  '( )'  33 % is function
       # '( (a) > (b) )' 100% is NOT function
-      if (util.find((util.substr(self.source.str, found + 1,
-                                 current_position.get_index() - found - 1)),
-                    ")") != -1):  # Possible: [while] or [if]
+      if (current_position.get_index() - found > 1 and
+          (util.find((util.substr(self.source.str, found + 1,
+                                  current_position.get_index() - found - 1)),
+                     ")") != -1)):  # Possible: [while] or [if]
         current_position.set_at_left_bound_parenthesis()
         its_not_function = True
       else:  # Possible: [function] or [while] or [if]
