@@ -6,5 +6,5 @@ if __name__ == '__main__':
 import convert
 
 print(
-    convert.convert_file(
-        os.path.dirname(os.path.abspath(__file__)) + "/modules/stats.cpp"))
+    convert.convert_files(
+        os.path.dirname(os.path.abspath(__file__)) + "/modules"))
