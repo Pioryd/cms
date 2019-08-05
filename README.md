@@ -2,11 +2,11 @@
 
 <img align="left" src="doc/cms_struct.png">
 
-**Project Status:**
-* Build: Stable
-* Type: Early Access
-* Tests: Full
-* Documentation: Full
+* **Project Status:**
+  - Build: Stable
+  * Type: Early Access
+  * Tests: Full
+  * Documentation: source full
 
 **CMS allow to script in C++ syntax.**
 
@@ -15,6 +15,7 @@ Can work in 2 ways:
 * scripted as converted to python
 
 For example CMS(C++) file converted to python file:
+
  **C++:**
 ```cpp
 #include <cms>
