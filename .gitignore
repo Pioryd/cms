@@ -1,6 +1,9 @@
 # Python
 __pycache__
 
+# Cms output
+example/modules/*.cpp.py
+
 # Visual Studio Code
 .vscode
 
