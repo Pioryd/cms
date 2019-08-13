@@ -6,6 +6,7 @@ example/modules/*.cpp.py
 
 # Visual Studio Code
 .vscode
+.env
 
 # Visual Studio IDE
 .vs
